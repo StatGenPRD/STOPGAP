@@ -1,4 +1,4 @@
-#--------Run STOPGAP2 R functions to generate STOPGAP2 datasets ----------------#
+#--------Run STOPGAP2 R functions to generate STOPGAP2 datasets -----------------#
 # Author: Judong Shen
 
 setwd("STOPGAP.working.directory")
