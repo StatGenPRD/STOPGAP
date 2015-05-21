@@ -297,7 +297,6 @@ gwas.snps <- function(gwas.file="stopgap_3sources.RData"){
 # Coordinate lookup and LD calculation based on the 1KG data for the new SNPs identified in this version
 # run.ld: Calculate the LD SNPs based on the 
 # rslist is the list of rs IDs with # prefixed comment lines allowed
-# https://connect.gsk.com/sites/genetics/GeneticsWIKI/Wiki%20Pages/STOPGAP%20-%20LD%20Calculation.aspx
 run.ld <- function(){
   # Input SNPs: stopgap2_SNPs.txt
   
