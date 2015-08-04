@@ -138,9 +138,9 @@ while i < len(rscoord) :
                                         found = '0'
                                         for k in line2 :
                                                 k = k.split(':')
-                                                if k[0] in chroms and k[1][0:2] == 'g.' :                                        
+                                                if k[0] in chroms :
+                                                  if len(k) > 1 and k[1][0:2] == 'g.' :
                                                         chrom = chroms[k[0]]
-                                             
                                                         parse = re.search(r"^g\.(\d+)(.+)>(.+)$", k[1])
                                                         if parse == None :
                                                                 vtype = 'not_snv'
@@ -162,7 +162,6 @@ while i < len(rscoord) :
                                                         #print found
                                                        #if no coordinates found yet, initialize to this coord
                                                         if found == '0' :
-                                                        
                                                                 found = [chrom + ':' + coord, vtype, ref, alt, 'rs' + currid]
                                                         #if already set to blank due to observing more than one coordinate, skip to next
                                                         elif found[0] == '' :
@@ -176,7 +175,8 @@ while i < len(rscoord) :
                                                         #if more than one coordinate, set blanks
                                                         else :
                                                                 found = ['', vtype, '', '', 'rs' + currid]
-                                                
+                                                  else :
+                                                          found = ['','','','','rs' + currid]
                                         if found != '0' :                                
                                                 rscoord[rsid] = found
                                                 #print 'final: ' + str(rsid) + ' ' + str(found)
@@ -185,7 +185,7 @@ while i < len(rscoord) :
         i = j
 #print(rscoord)
 os.remove(outdir + '/fetch.out') 
-                
+
 #determine what not found and write output file
 bed = {}
 with open(outdir + '/rsID_Coordinates.txt',"w") as outlist, open(outdir + '/rsIDsNotFound.txt',"w") as noutlist, open(outdir + '/rsIDNotSNV.txt', "w") as ioutlist, open(outdir + '/rsIDambig.txt', "w") as aoutlist :
