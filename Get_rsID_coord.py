@@ -167,10 +167,11 @@ while i < len(rscoord) :
                                                         elif found[0] == '' :
                                                                 continue
                                                         #if in PAR and Y coord found but now have X, replace with X
-                                                        elif found[0][0] == 'Y' and ((coord >= 10001 and coord <= 2649520) or (coord >= 59034050 and coord <= 59363566)) and chrom == 'X' :
+                                                        elif found[0][0] == 'Y' and ((int(coord) >= 60001 and int(coord) <= 2699520) or (int(coord) >= 154931044 and int(coord) <= 155260560 )) and chrom == 'X' :
                                                                 found = [chrom + ':' + coord, vtype, ref, alt, 'rs' + currid]
                                                         #if in PAR and X coord found but now have Y, skip to next
-                                                        elif found == 'X' and ((coord >= 60001 and coord <= 2699520) or (coord >= 154931044 and coord <= 155260560 )) and chrom == 'Y' :
+                                                        elif found[0][0] == 'X' and ((int(coord) >= 10001 and int(coord) <= 2649520) or (int(coord) >= 59034050 and int(coord) <= 59363566 )) and chrom == 'Y' :
+                                                                print 'here'
                                                                 continue
                                                         #if more than one coordinate, set blanks
                                                         else :
@@ -232,6 +233,7 @@ with open(outdir + '/rsID_Coordinates.txt',"w") as outlist, open(outdir + '/rsID
                               bed[chrpos[0]].append(int(chrpos[1]))
 
 #Create bed files for each chromosome
+#Note, for vcftools v0.1.12b --geno-r2-positions, start and end must both = POS instead of traditional bed format where start is POS - 1
 for chrom in bed.keys() :
         with open(outdir + '/chr' + chrom + '.bed',"w") as bedout :
                 line = ('#chrom','start','end')
