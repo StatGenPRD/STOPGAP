@@ -137,6 +137,8 @@ while i < len(rscoord) :
                                         #print line2
                                         found = '0'
                                         for k in line2 :
+                                                #print "k:" + k
+                                                #print "found:" + "|".join(found)
                                                 k = k.split(':')
                                                 if k[0] in chroms :
                                                   if len(k) > 1 and k[1][0:2] == 'g.' :
@@ -162,21 +164,26 @@ while i < len(rscoord) :
                                                         #print found
                                                        #if no coordinates found yet, initialize to this coord
                                                         if found == '0' :
+                                                                #print "in found0"
                                                                 found = [chrom + ':' + coord, vtype, ref, alt, 'rs' + currid]
                                                         #if already set to blank due to observing more than one coordinate, skip to next
                                                         elif found[0] == '' :
+                                                                #print "in found1"
                                                                 continue
                                                         #if in PAR and Y coord found but now have X, replace with X
-                                                        elif found[0][0] == 'Y' and ((int(coord) >= 60001 and int(coord) <= 2699520) or (int(coord) >= 154931044 and int(coord) <= 155260560 )) and chrom == 'X' :
+                                                        elif found[0][0] == 'Y' and coord != '' and ((int(coord) >= 60001 and int(coord) <= 2699520) or (int(coord) >= 154931044 and int(coord) <= 155260560 )) and chrom == 'X' :
+                                                                #print 'Xhere'
                                                                 found = [chrom + ':' + coord, vtype, ref, alt, 'rs' + currid]
                                                         #if in PAR and X coord found but now have Y, skip to next
-                                                        elif found[0][0] == 'X' and ((int(coord) >= 10001 and int(coord) <= 2649520) or (int(coord) >= 59034050 and int(coord) <= 59363566 )) and chrom == 'Y' :
-                                                                print 'here'
+                                                        elif found[0][0] == 'X' and coord != '' and ((int(coord) >= 10001 and int(coord) <= 2649520) or (int(coord) >= 59034050 and int(coord) <= 59363566 )) and chrom == 'Y' :
+                                                                #print 'here'
                                                                 continue
                                                         #if more than one coordinate, set blanks
                                                         else :
+                                                                #print "found5"
                                                                 found = ['', vtype, '', '', 'rs' + currid]
                                                   else :
+                                                          #print "found6"
                                                           found = ['','','','','rs' + currid]
                                         if found != '0' :                                
                                                 rscoord[rsid] = found
@@ -185,7 +192,7 @@ while i < len(rscoord) :
         fetch.close()
         i = j
 #print(rscoord)
-os.remove(outdir + '/fetch.out') 
+os.remove(outdir + '/fetch.out')
 
 #determine what not found and write output file
 bed = {}
