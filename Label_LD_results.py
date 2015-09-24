@@ -43,8 +43,10 @@ with gzip.open(VARDEF + '/chr' + options.chrom + '.ID.txt.gz','rb') as TG, open(
         #read through LD results and identify unique POS values that need labeling
         for LDi in LD :
                 data = LDi.strip().split('\t')
-                TGVCF[data[1]] = []
-                TGVCF[data[3]] = []
+                #Exclude anything more than 500kb apart
+                if abs(int(data[1]) - int(data[3])) <= 500000 :
+                        TGVCF[data[1]] = []
+                        TGVCF[data[3]] = []
         #Single header POS ID REF ALT
         vari = TG.readline()
         #read through ID file and store ID REF and ALT for each POS in LD results
@@ -52,6 +54,10 @@ with gzip.open(VARDEF + '/chr' + options.chrom + '.ID.txt.gz','rb') as TG, open(
                 coord = vari.strip().split('\t')
                 if coord[0] in TGVCF.keys() :
                         TGVCF[coord[0]].append(coord)
+                """
+                if c % 10000 == 0 :
+                        print c
+                """
  
 with open(indir + '/chr' + options.chrom + '.LD.list.geno.ld','r') as LD , open(indir + '/chr' + options.chrom + '.labeled.ld','w') as out:
         #Initialize out header
@@ -66,33 +72,34 @@ with open(indir + '/chr' + options.chrom + '.LD.list.geno.ld','r') as LD , open(
         I1 = 1
         I2 = 1
         #read through LD results and determine index based on previous result
+        #first POS is the "requested" variant (the one where we wanted to find LD values)
+        #second POS is the variant found in the dataset with R^2 > 0.5 minimum specified
         for LDi in LD :
                 data = LDi.strip().split('\t')
-                if int(data[1]) == P1 :
-                        if int(data[3]) == P2  :
-                                I2 += 1
-                        else :
-                                I2 = 1
-                        if int(data[3]) < P2 :
-                                I1 += 1
-                else :
-                        I1 = 1
-                        I2 = 1
-                #Store POS values for determining index of next result
-                P1 = int(data[1])
-                P2 = int(data[3])
-                #Using index, lookup ID(s), REF and ALT for each POS1 and POS2
-                ID1 = TGVCF[data[1]][I1 - 1][1].split(';')
-                REF1 = TGVCF[data[1]][I1 - 1][2]
-                ALT1 = TGVCF[data[1]][I1 - 1][3]
-                ID2 = TGVCF[data[3]][I2 - 1][1].split(';')
-                REF2 = TGVCF[data[3]][I2 - 1][2]
-                ALT2 = TGVCF[data[3]][I2 - 1][3]
                 #Restrict to results within 500 kb
                 if abs(int(data[1]) - int(data[3])) <= 500000 :
+                        if int(data[1]) == P1 :
+                                if int(data[3]) == P2  : #this indicates replicate second POS
+                                        I2 += 1
+                                else :
+                                        I2 = 1 #reset second POS index if we have moved on to a different second POS while still in first POS
+                                if int(data[3]) < P2 : #If second POS has decreased, while first POS same, this indicates replicate first POS
+                                        I1 += 1
+                        else : #reset both indices if we have moved on to a different first POS
+                                I1 = 1
+                                I2 = 1
+                        #Store POS values for determining index of next result
+                        P1 = int(data[1])
+                        P2 = int(data[3])
+                        #Using index, lookup ID(s), REF and ALT for each POS1 and POS2
+                        ID1 = TGVCF[data[1]][I1 - 1][1].split(';') #possible to have multiple IDs
+                        REF1 = TGVCF[data[1]][I1 - 1][2]
+                        ALT1 = TGVCF[data[1]][I1 - 1][3]
+                        ID2 = TGVCF[data[3]][I2 - 1][1].split(';')
+                        REF2 = TGVCF[data[3]][I2 - 1][2]
+                        ALT2 = TGVCF[data[3]][I2 - 1][3]
                         #for each ID for POS1 and POS2, write input LD result with ID, REF and ALT
                         for i in ID1 :
                                 for j in ID2 :
                                         datap = data + [i,REF1,ALT1,j,REF2,ALT2]
                                         out.write('\t'.join(datap) + '\n')
-										
